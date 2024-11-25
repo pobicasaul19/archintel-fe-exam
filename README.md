@@ -10,4 +10,4 @@
 ## Server Side
 - cd server
 - npm instal
-- node server.js
+- npm run start
