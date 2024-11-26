@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('swagger-jsdoc');
+const swaggerSpecs = require('./swagger');
 
 const app = express();
 
@@ -15,24 +15,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-// Swagger Configuration
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Writer/Editor Dashboard Site API Documentation',
-      version: '1.0.0',
-      description: 'Automatically generated API documentation.',
-    },
-    servers: [
-      {
-        url: 'http://localhost:5000/api',
-      },
-    ],
-  },
-  apis: ['./routes/**/*.js'],
-};
-const swaggerInfo = swaggerDocument(swaggerOptions);
 // Swagger UI
 app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerInfo));
 

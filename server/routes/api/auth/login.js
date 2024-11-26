@@ -10,8 +10,8 @@ const { login } = require('../../../controller/authController.js');
  *       - Auth
  *     parameters:
  *       - in: query
- *         name: firstName
- *         description: Firstname
+ *         name: userName
+ *         description: Username
  *         required: true
  *         schema:
  *           type: string

@@ -4,14 +4,13 @@ const { loadUserCollection } = require('../config/db');
 
 // Generate access token
 const generateAccessToken = (userId) => {
-  return jwt.sign({ id: userId }, 'archintel_dev', { expiresIn: '30m' });
+  return jwt.sign({ id: userId }, 'archintel_test_asssesment', { expiresIn: '30m' });
 };
 
 // Register user
 const register = async (req, res) => {
   try {
     const usersCollection = await loadUserCollection();
-    // const { firstName, lastName, type, status, password } = req.body;
     const firstName = req.query.firstName || req.body.firstName;
     const lastName = req.query.lastName || req.body.lastName;
     const type = req.query.type || req.body.type;
@@ -36,17 +35,15 @@ const register = async (req, res) => {
       id: counter + 1,
       firstName,
       lastName,
+      userName: `${firstName}${lastName}`.toLowerCase(),
       type,
       status,
       password: hashedPassword,
     };
 
     await usersCollection.insertOne(newUser);
-    // await passwordsCollection.insertOne({ userId, hashedPassword });
-
-    const accessToken = generateAccessToken(userId);
     res.status(201).json({
-      data: { user: { ...newUser }, token: accessToken },
+      data: { user: { ...newUser } },
       metadata: { message: 'User created successfully.' },
     });
   } catch (error) {
@@ -58,37 +55,37 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const usersCollection = await loadUserCollection();
-    const firstName = req.query.firstName || req.body.firstName;
-    const password = req.query.password || req.body.password
+    const userName = req.query.userName || req.body.userName;
+    const password = req.query.password || req.body.password;
+
     // Validate input
-    if (!firstName || !password) {
+    if (!userName || !password) {
       return res.status(400).json({ message: 'Please enter all fields.' });
     }
-
-    const user = await usersCollection.findOne({ firstName });
+    // Find user by userName
+    const user = await usersCollection.findOne({ userName });
     if (!user) {
       return res.status(404).json({ message: 'User does not exist.' });
     }
-
-    const userPasswordRecord = await usersCollection.findOne({ userId: user._id });
-    if (!userPasswordRecord) {
-      return res.status(404).json({ message: 'Password record not found.' });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, userPasswordRecord.hashedPassword);
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Unauthorized.' });
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
-
+    // Generate token
     const accessToken = generateAccessToken(user._id);
+    // Exclude password from response
+    const { password: _, ...userWithoutPassword } = user;
+
     res.status(200).json({
-      data: { user, token: accessToken },
-      metadata: { message: 'Login successful.' },
+      data: { user: userWithoutPassword, token: accessToken },
+      metadata: { message: 'Authorized' },
     });
   } catch (error) {
-    console.log(error)
+    console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 module.exports = { register, login };
