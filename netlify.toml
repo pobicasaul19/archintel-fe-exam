@@ -1,0 +1,3 @@
+[build]
+  command = "npm install" # Install dependencies
+  functions = "netlify/functions" # Specify the functions folder
