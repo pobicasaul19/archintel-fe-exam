@@ -1,6 +1,11 @@
 const mongodb = require('mongodb');
 const uri = process.env.URI;
 
+if (!uri) {
+  console.error('MongoDB connection URI is not defined.');
+  throw new Error('MongoDB connection URI is missing. Please check your environment variables.');
+}
+
 // Helper function to get a MongoDB collection dynamically
 const getCollection = async (collectionName) => {
   const client = new mongodb.MongoClient(uri);
@@ -10,9 +15,11 @@ const getCollection = async (collectionName) => {
   } catch (error) {
     console.error('Database connection failed:', error.message); // Log detailed error
     throw new Error('Failed to connect to the database.');
+  } finally {
+    // Optionally close the client if the connection is temporary
+    // await client.close();
   }
 };
-
 
 // Predefined collection loaders for common collections
 const loadUserCollection = () => getCollection('user');
