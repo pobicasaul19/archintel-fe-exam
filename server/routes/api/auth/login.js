@@ -1,5 +1,5 @@
 const express = require('express');
-const { login } = require('../../../controller/authController.cjs');
+const { login } = require('../../../controller/authController.js');
 /**
  * @swagger
  * /auth/login:
@@ -11,7 +11,7 @@ const { login } = require('../../../controller/authController.cjs');
  *     parameters:
  *       - in: query
  *         name: firstName
- *         description: User Firstname
+ *         description: Firstname
  *         required: true
  *         schema:
  *           type: string

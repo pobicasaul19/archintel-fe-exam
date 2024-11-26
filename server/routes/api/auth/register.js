@@ -1,5 +1,5 @@
 const express = require('express');
-const { register } = require('../../../controller/authController.cjs');
+const { register } = require('../../../controller/authController.js');
 
 /**
  * @swagger
@@ -34,6 +34,12 @@ const { register } = require('../../../controller/authController.cjs');
  *         required: true
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: password
+ *         description: Password
+ *         required: false
+ *         schema:
+ *           type: string
  *     responses:
  *       201:
  *         description: Successfully registered
@@ -42,7 +48,5 @@ const { register } = require('../../../controller/authController.cjs');
  */
 
 const router = express.Router();
-
 router.post('/', register);
-
 module.exports = router;

@@ -1,33 +1,24 @@
-const path = require('path');
+const mongodb = require('mongodb');
+const uri = process.env.URI;
 
-const dbFilePath = path.resolve('db.json');
-let db;
-
-const initializeDatabase = async () => {
-  if (!db) {
-    const { Low } = await import('lowdb');
-    const { JSONFile } = await import('lowdb/node');
-    const adapter = new JSONFile(dbFilePath);
-    db = new Low(adapter);
-
-    await db.read();
-    db.data ||= {
-      users: [],
-      companies: [],
-      articles: [],
-    };
-    await db.write();
+// Helper function to get a MongoDB collection dynamically
+const getCollection = async (collectionName) => {
+  try {
+    const client = await mongodb.MongoClient.connect(uri);
+    return client.db('DB').collection(collectionName);
+  } catch (error) {
+    throw new Error('Failed to connect to the database.');
   }
 };
 
-const loadCollection = async (collectionName) => {
-  await initializeDatabase();
-  return db.data[collectionName];
-};
+// Predefined collection loaders for common collections
+const loadUserCollection = () => getCollection('user');
+const loadCompanyCollection = () => getCollection('company');
+const loadArticleCollection = () => getCollection('article');
 
-const saveDatabase = async () => {
-  await initializeDatabase();
-  await db.write();
+module.exports = {
+  getCollection,
+  loadUserCollection,
+  loadCompanyCollection,
+  loadArticleCollection,
 };
-
-module.exports = { initializeDatabase, loadCollection, saveDatabase };

@@ -1,26 +1,43 @@
-const { loadCollection, saveDatabase } = require('../config/db');
+const mongoose = require('mongoose');
 
-const validateArticle = (article, companies) => {
-  if (!article.id || !article.image || !article.title || !article.link || !article.date || !article.content) {
-    throw new Error('All fields are required: related company, image, title, link, date, and content.');
+// Validation regex for URL format
+const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,4}(\/[^\s]*)?$/;
+
+const articleSchema = mongoose.Schema(
+  {
+    relatedCompany: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: [true, 'A related company is required.'],
+    },
+    image: {
+      type: String,
+      required: [true, 'An image URL is required.'],
+    },
+    title: {
+      type: String,
+      required: [true, 'A title is required.'],
+    },
+    link: {
+      type: String,
+      required: [true, 'A link is required.'],
+      validate: {
+        validator: (value) => urlRegex.test(value),
+        message: 'Invalid URL format.',
+      },
+    },
+    date: {
+      type: Date,
+      required: [true, 'A publication date is required.'],
+    },
+    content: {
+      type: String,
+      required: [true, 'Content is required.'],
+    },
+  },
+  {
+    timestamps: true,
   }
-  if (!companies.find((c) => c.id === article.id)) {
-    throw new Error('Invalid related company.');
-  }
-  const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,4}(\/[^\s]*)?$/;
-  if (!urlRegex.test(article.link)) {
-    throw new Error('Invalid URL format for link.');
-  }
-};
+);
 
-const addArticle = async (article) => {
-  const companies = await loadCollection('companies');
-  validateArticle(article, companies);
-
-  const articles = await loadCollection('articles');
-  articles.push({ id: Date.now(), ...article });
-  await saveDatabase();
-  return article;
-};
-
-module.exports = { addArticle };
+module.exports = mongoose.model('Article', articleSchema);

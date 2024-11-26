@@ -1,17 +1,25 @@
-const { loadCollection, saveDatabase } = require('../config/db');
+const mongoose = require('mongoose');
 
-const validateCompany = (company) => {
-  if (!company.logo || !company.name || !['Active, Inactive'].includes(company.status)) {
-    throw new Error('All fields are required: logo, name, and status.');
+const companySchema = mongoose.Schema(
+  {
+    logo: {
+      type: String,
+      required: [true, 'A logo URL is required.'],
+    },
+    name: {
+      type: String,
+      required: [true, 'A company name is required.'],
+      unique: true,
+    },
+    status: {
+      type: String,
+      enum: ['Active', 'Inactive'],
+      required: [true, 'A status is required.'],
+    },
+  },
+  {
+    timestamps: true,
   }
-};
+);
 
-const addCompany = async (company) => {
-  validateCompany(company);
-  const companies = await loadCollection('companies');
-  companies.push({ id: Date.now(), ...company });
-  await saveDatabase();
-  return company;
-};
-
-module.exports = { addCompany };
+module.exports = mongoose.model('Company', companySchema);
