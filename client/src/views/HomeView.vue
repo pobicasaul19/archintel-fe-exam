@@ -8,7 +8,7 @@ const userName = computed(() => `${store.userInfo?.firstName} ${store.userInfo?.
 
 const logout = () => {
   store.logout();
-  router.push('account/login');
+  router.push('/account/login');
 };
 </script>
 
