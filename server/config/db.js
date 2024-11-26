@@ -1,5 +1,5 @@
 const mongodb = require('mongodb');
-const uri = process.env.URI;
+const uri = process.env.uri;
 
 if (!uri) {
   console.error('MongoDB connection URI is not defined.');
@@ -15,9 +15,6 @@ const getCollection = async (collectionName) => {
   } catch (error) {
     console.error('Database connection failed:', error.message); // Log detailed error
     throw new Error('Failed to connect to the database.');
-  } finally {
-    // Optionally close the client if the connection is temporary
-    // await client.close();
   }
 };
 
