@@ -32,4 +32,4 @@ app.use('/api/users/update', verifyToken, update)
 
 const port = process.env.PORT || 5000;
 
-app.listen(port);
+app.listen(port, () => console.log(`Server running ${port}`));
