@@ -3,6 +3,12 @@ import { useAuthStore } from "@/stores/useAuthStore";
 
 const routes = [
   {
+    path: "/account/login",
+    name: "\u2015 Log-in",
+    component: () =>
+      import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
+  },
+  {
     path: "/",
     name: "\u2015 Dashboard",
     component: () => import(/* webpackChunkName: "dashboard" */ "../views/HomeView.vue"),
@@ -11,10 +17,12 @@ const routes = [
     },
   },
   {
-    path: "/account/login",
-    name: "\u2015 Log-in",
-    component: () =>
-      import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
+    path: "/all-media",
+    name: "\u2015 All Media",
+    component: () => import(/* webpackChunkName: "dashboard" */ "../views/AllMediaView.vue"),
+    meta: {
+      authRequired: true,
+    },
   },
 ];
 

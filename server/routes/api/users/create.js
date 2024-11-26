@@ -1,14 +1,14 @@
 const express = require('express');
-const { register } = require('../../../controller/authController.js');
+const { userController } = require('../../../controller/userController');
 
 /**
  * @swagger
- * /auth/register:
+ * /api/users/create:
  *   post:
- *     summary: Register
- *     description: Register a new user with the provided details.
+ *     summary: Create User
+ *     description: Create a new user with the provided details.
  *     tags:
- *       - Auth
+ *       - User
  *     parameters:
  *       - in: query
  *         name: firstName
@@ -48,5 +48,5 @@ const { register } = require('../../../controller/authController.js');
  */
 
 const router = express.Router();
-router.post('/', register);
+router.post('/', userController);
 module.exports = router;

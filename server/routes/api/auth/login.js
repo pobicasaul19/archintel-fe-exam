@@ -2,7 +2,7 @@ const express = require('express');
 const { login } = require('../../../controller/authController.js');
 /**
  * @swagger
- * /auth/login:
+ * /api/auth/login:
  *   post:
  *     summary: Login
  *     description: Login user and generate bearer token.

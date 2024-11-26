@@ -1,8 +1,4 @@
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('swagger-jsdoc');
+const swaggerJSDoc = require('swagger-jsdoc');
 
 const swaggerOptions = {
   definition: {
@@ -12,10 +8,25 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Automatically generated API documentation.',
     },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter your token in the format: Bearer <token>',
+        },
+      },
+    },
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
   apis: ['./routes/**/*.js'],
 };
 
-const swaggerInfo = swaggerDocument(swaggerOptions);
+const swaggerInfo = swaggerJSDoc(swaggerOptions);
 
 module.exports = swaggerInfo;

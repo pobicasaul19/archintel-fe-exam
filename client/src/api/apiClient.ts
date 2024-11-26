@@ -9,6 +9,7 @@ import axios, {
 import router from "@/router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
+
 export interface ApiError {
   message: string;
   status?: number | null;
@@ -29,7 +30,7 @@ export interface ApiResponse<T> {
 }
 
 const authStore = useAuthStore();
-const apiUrl = 'http://localhost:5000/api/';
+const apiUrl = 'http://localhost:5000/api/'
 
 export class HttpClient {
   protected axiosInstance: AxiosInstance;

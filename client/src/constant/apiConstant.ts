@@ -4,7 +4,7 @@ type CrudEndpoints = {
   GET_ALL: string;
   POST: string;
   // GET_DETAILS: (uuid: string) => string;
-  // PUT_DETAILS: (uuid: string) => string;
+  UPDATE: (_id: number) => string;
   DELETE: (_id: number) => string;
 };
 
@@ -17,7 +17,8 @@ const createCrudEndpoints = <T extends CustomEndpoints = {}>(
   const crud: CrudEndpoints = {
     GET_ALL: getBaseUrl(base),
     POST: getBaseUrl(base),
-    DELETE: (id: number) => `${getBaseUrl(base)}/${id}`,
+    UPDATE: (_id: number) => `${getBaseUrl(base)}/${_id}`,
+    DELETE: (_id: number) => `${getBaseUrl(base)}/${_id}`,
   };
 
   return { ...crud, ...additionalEndpoints } as CrudEndpoints & T;
@@ -26,9 +27,8 @@ const createCrudEndpoints = <T extends CustomEndpoints = {}>(
 
 // Endpoints related to authentication operations.
 export const AUTH_ENDPOINTS = {
-  POST_LOGIN: getBaseUrl("auth/login"),
-  POST_SIGNUP: getBaseUrl("auth/register"),
+  POST_LOGIN: getBaseUrl('auth/login'),
 };
 
 // USER_ENDPOINTS
-export const USER_ENDPOINTS = createCrudEndpoints("users");
+export const USER_ENDPOINTS = createCrudEndpoints('users');

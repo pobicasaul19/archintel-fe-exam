@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./swagger');
+const swaggerInfo = require('./swagger');
 
 const app = express();
 
@@ -21,12 +21,14 @@ app.use('/documentation', swaggerUi.serve, swaggerUi.setup(swaggerInfo));
 // Auth
 const login = require('./routes/api/auth/login')
 app.use('/api/auth/login', login)
-const register = require('./routes/api/auth/register')
-app.use('/api/auth/register', register)
 
 // Users
-// const users = require('./routes/api/users')
-// app.use('/api/users', verifyToken, users)
+const users = require('./routes/api/users')
+const create = require('./routes/api/users/create')
+const update = require('./routes/api/users/update')
+app.use('/api/users', verifyToken, users)
+app.use('/api/users/create', verifyToken, create)
+app.use('/api/users/update', verifyToken, update)
 
 const port = process.env.PORT || 5000;
 
