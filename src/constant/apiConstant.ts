@@ -3,9 +3,7 @@ const getBaseUrl = (path: string) => path;
 type CrudEndpoints = {
   GET_ALL: string;
   POST: string;
-  // GET_DETAILS: (uuid: string) => string;
   UPDATE: (_id: number) => string;
-  DELETE: (_id: number) => string;
 };
 
 type CustomEndpoints = Record<string, (...args: any[]) => string>;
@@ -18,7 +16,6 @@ const createCrudEndpoints = <T extends CustomEndpoints = {}>(
     GET_ALL: getBaseUrl(base),
     POST: getBaseUrl(base),
     UPDATE: (_id: number) => `${getBaseUrl(base)}/${_id}`,
-    DELETE: (_id: number) => `${getBaseUrl(base)}/${_id}`,
   };
 
   return { ...crud, ...additionalEndpoints } as CrudEndpoints & T;

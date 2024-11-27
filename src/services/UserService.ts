@@ -12,10 +12,11 @@ class UserService {
 
   public async addUser(payload: UserPayload): Promise<void> {
     const response = await authorizedHttpClient.post<string, UserPayload>(
-      USER_ENDPOINTS.POST,
+      `${USER_ENDPOINTS.POST}/create`,
       payload
     );
-    return response.data as any;
+    console.log(response.data)
+    return response as any;
   }
 
   public async updateUser(payload: UserPayload, _id: number): Promise<void> {

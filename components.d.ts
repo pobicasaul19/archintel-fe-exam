@@ -7,17 +7,26 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppForm: typeof import('./src/components/AppForm.vue')['default']
+    AppListItem: typeof import('./src/components/AppListItem.vue')['default']
+    AppModal: typeof import('./src/components/AppModal.vue')['default']
     AppSidenav: typeof import('./src/components/AppSidenav.vue')['default']
     Button: typeof import('primevue/button')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
+    Column: typeof import('primevue/column')['default']
+    DataTable: typeof import('primevue/datatable')['default']
+    Dialog: typeof import('primevue/dialog')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     HeaderView: typeof import('./src/components/HeaderView.vue')['default']
     InputSwitch: typeof import('primevue/inputswitch')['default']
     InputText: typeof import('primevue/inputtext')['default']
+    ListItem: typeof import('./src/components/Form/ListItem.vue')['default']
     Password: typeof import('primevue/password')['default']
     Progress: typeof import('./src/components/icons/Progress.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Select: typeof import('primevue/select')['default']
+    Skeleton: typeof import('primevue/skeleton')['default']
     Toast: typeof import('primevue/toast')['default']
     ToggleSwitch: typeof import('primevue/toggleswitch')['default']
   }

@@ -1,27 +1,43 @@
 import { defineStore } from 'pinia';
-import type { AuthUser, User } from "../models/User";
+import { ref, computed } from 'vue';
+import type { AuthUser, User } from '../models/User';
 
-export const useAuthStore = defineStore('auth', {
-  state: (): AuthUser => ({
-    userInfo: null,
-    token: null,
-  }),
-  getters: {
-    isAuthenticated: (state) => !!state.userInfo && !!state.token,
-    getUserInfo: (state) => state.userInfo,
-    getUserById: (state) => (_id: number) => state.userInfo?._id === _id
-  },
-  actions: {
-    setUserInfo(user: User) {
-      this.userInfo = user;
-    },
-    setToken(token: string) {
-      this.token = token;
-    },
-    logout() {
-      this.userInfo = null;
-      this.token = null;
-    }
-  },
-  persist: true
-});
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const userInfo = ref<AuthUser['userInfo']>(null);
+  const token = ref<AuthUser['token']>(null);
+
+  // Getters
+  const isAuthenticated = computed(() => !!userInfo.value && !!token.value);
+  const getUserInfo = computed(() => userInfo.value);
+  const getUserById = (_id: number) => computed(() => userInfo.value?._id === _id);
+  const getUsername = computed(() => `${userInfo.value?.firstName} ${userInfo.value?.lastName}`);
+
+  // Actions
+  const setUserInfo = (user: User) => {
+    userInfo.value = user;
+  };
+  const setToken = (newToken: string) => {
+    token.value = newToken;
+  };
+  const logout = () => {
+    userInfo.value = null;
+    token.value = null;
+  };
+
+  return {
+    userInfo,
+    token,
+    isAuthenticated,
+    getUserInfo,
+    getUserById,
+    getUsername,
+    setUserInfo,
+    setToken,
+    logout,
+  };
+},
+  {
+    persist: true
+  }
+);

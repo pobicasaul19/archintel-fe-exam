@@ -30,7 +30,7 @@ export interface ApiResponse<T> {
 }
 
 const authStore = useAuthStore();
-const apiUrl = 'http://localhost:5000/api/'
+const apiUrl = 'http://localhost:5000/api'
 
 export class HttpClient {
   protected axiosInstance: AxiosInstance;
@@ -41,7 +41,6 @@ export class HttpClient {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      timeout: 20000,
     });
   }
 

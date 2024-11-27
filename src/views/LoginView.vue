@@ -1,70 +1,83 @@
 <script setup lang='ts'>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "../stores/useAuthStore";
-import { useToast } from "primevue/usetoast";
-import LoginService from "../services/LoginService";
-import type { loginData } from "../models/Authentication";
+  import { ref } from "vue";
+  import { useRouter } from "vue-router";
+  import { useAuthStore } from "../stores/useAuthStore";
+  import { useToast } from "primevue/usetoast";
+  import LoginService from "../services/LoginService";
+  import type { loginData } from "../models/Authentication";
+  import type { User } from "../models/User"
 
-const router = useRouter();
-const authStore = useAuthStore();
-const toast = useToast();
+  const router = useRouter();
+  const authStore = useAuthStore();
+  const toast = useToast();
 
-const form = ref<loginData>({
-  userName: "",
-  password: "",
-});
+  const form = ref<loginData>({
+    userName: "",
+    password: "",
+  });
 
-const loading = ref(false);
-const login = async () => {
-  loading.value = true;
-  try {
-    const response = await LoginService.validateLogin(form.value);
-    authStore.setUserInfo({ ...response.user });
-    authStore.setToken(response.token);
-    toast.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Login Successful',
-      life: 3000,
-    });
-    router.push("/");
-  } catch (error) {
-    console.log(error)
-    toast.add({
-      severity: 'error',
-      summary: 'Login Failed',
-      detail: 'An error occurred while logging in.',
-      life: 3000
-    })
-  } finally {
-    loading.value = false;
+  interface DataResponse {
+    user: User;
+    token: string;
   }
-};
+
+  const handleSuccess = ({ token, user }: DataResponse) => {
+    authStore.setUserInfo(user);
+    authStore.setToken(token);
+    toast.add({
+      severity: "success",
+      summary: "Login Successful",
+      detail: "You have been successfully logged in.",
+    });
+    setTimeout(() => {
+      router.push("/");
+    }, 1500)
+  };
+
+  const loading = ref(false);
+  const login = async () => {
+    loading.value = true;
+    try {
+      const response = await LoginService.validateLogin(form.value);
+      console.log(response)
+      handleSuccess(response)
+    } catch (error) {
+      console.log(error)
+      toast.add({
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: 'An error occurred while logging in.',
+        life: 3000
+      })
+    } finally {
+      loading.value = false;
+    }
+  };
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center w-full h-screen">
-    <form @submit.prevent="login" class="border p-10 rounded-lg shadow-sm space-y-5">
-      <div>
-        <label class="block" for="username">Username</label>
+    <form @submit.prevent="login" class="border p-10 rounded-lg shadow-sm space-y-6">
+      <FloatLabel>
         <InputText
           id="username"
           type="name"
           v-model="form.userName"
           class="mt-1 block w-full"
         />
-      </div>
-      <div>
-        <label class="block" for="password">Password</label>
+        <label class="block" for="username">Username</label>
+      </FloatLabel>
+      <FloatLabel class="w-full">
         <Password
           id="password"
+          type="password"
           v-model="form.password"
           toggleMask
-          class="mt-1 w-full"
+          class="w-full"
           :feedback="false"
         />
-      </div>
+        <label for="password">Password</label>
+      </FloatLabel>
       <div class="flex items-center justify-center">
         <Button
           type="submit"
