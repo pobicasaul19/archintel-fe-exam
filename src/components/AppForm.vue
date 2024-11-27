@@ -12,42 +12,24 @@
         <div class="w-3/4">
           <template v-if="items.type === 'input'">
             <InputText
-              v-if="items.model === 'firstName'"
-              v-model="userForm.firstName"
-              class="w-full capitalize"
-            />
-            <InputText
-              v-if="items.model === 'lastName'"
-              v-model="userForm.lastName"
+              v-model="formData[items.model]"
+              :class="{ capitalize: items.capitalize }"
               class="w-full capitalize"
             />
           </template>
           <template v-if="items.type === 'select'">
             <Select
-              v-if="items.model === 'type'"
-              v-model:model-value="userForm.type"
-              :options="type"
+              v-model:model-value="formData[items.model]"
+              :options="items.options"
               option-value="value"
               option-label="name"
               appendTo="body"
               class="w-full"
             />
-            <Select
-              v-if="items.model === 'status'"
-              v-model:model-value="userForm.status"
-              :options="status"
-              option-value="value"
-              option-label="name"
-              appendTo="body"
-              class="w-full"
-            />
-          </template>
-          <template v-if="props.mode === 'create' && items.model === 'password'">
-            <Password v-model="userForm.password" :feedback="false" toggleMask />
           </template>
         </div>
       </div>
-      <div class="flex items-center justify-center">
+      <div class="flex items-center justify-center space-x-5">
         <Button
           :loading="loading"
           type="submit"
@@ -56,89 +38,51 @@
           iconPos="right"
           class="!bg-[#0799c7] w-36 h-14 rounded-xl text-start !border-transparent"
         />
+        <slot name="publish" />
       </div>
     </div>
   </form>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, defineProps, watch } from 'vue'
+import { ref, defineProps, watch, reactive } from 'vue'
 import type { UserPayload } from '../models/User'
 import { useToast } from 'primevue/usetoast'
-import UserService from '../services/UserService'
-import { status } from '../utils/types'
-import { type } from '../utils/types'
 
 const props = defineProps<{
   onGetData: () => void
+  formData: Record<string, any>
+  itemFields: Array<{
+    type: 'input' | 'select'
+    label: string
+    model: string
+    capitalize?: boolean
+    options?: Array<{ name: string; value: any }>
+  }>
   user: UserPayload
   mode: 'create' | 'edit'
+  create: (payload: Record<string, any>) => Promise<void>
+  update: (payload: Record<string, any>, _id: number) => Promise<void>
+  _id: number
+  name: string
 }>()
 const emit = defineEmits(['close'])
 const showToast = useToast()
 
-const userForm = reactive<Record<string, any>>({
-  _id: '',
-  firstName: '',
-  lastName: '',
-  type: '',
-  status: '',
-  password: ''
-})
-
-const resetUserForm = () => {
-  userForm._id = ''
-  userForm.firstName = ''
-  userForm.lastName = ''
-  userForm.type = ''
-  userForm.status = ''
-  userForm.password = ''
-}
-
-const itemFields = [
-  {
-    type: 'input',
-    label: 'Firstname',
-    model: 'firstName'
-  },
-  {
-    type: 'input',
-    label: 'Lastname',
-    model: 'lastName'
-  },
-  {
-    type: 'select',
-    label: 'Type',
-    model: 'type'
-  },
-  {
-    type: 'select',
-    label: 'Status',
-    model: 'status'
-  },
-  {
-    type: 'password',
-    label: 'Password',
-    model: 'password'
-  }
-]
+const formData = reactive(props.formData)
 
 const loading = ref(false)
 const onSave = async () => {
   loading.value = true
-  const payload = { ...userForm }
+  const payload = { ...formData }
   delete payload._id
-  if (props.mode !== 'create') {
-    delete payload.password
-  }
+  delete payload.alt
   try {
-    props.mode === 'create'
-      ? await UserService.addUser(payload as UserPayload)
-      : await UserService.updateUser(payload as UserPayload, props.user._id)
+    props.mode === 'create' ? await props.create(payload) : await props.update(payload, props._id)
     showToast.add({
       severity: 'success',
       summary: 'Success',
-      detail: `Subscription was ${props.mode === 'edit' ? 'updated' : 'created'}  successfully.`,
+      detail: `${props.name} was ${props.mode === 'edit' ? 'updated' : 'created'}  successfully.`,
       life: 3000
     })
     props.onGetData()
@@ -152,15 +96,11 @@ const onSave = async () => {
 
 watch(
   () => props.mode,
-  (newMode) => {
-    if (newMode === 'create') {
-      resetUserForm()
-    } else if (newMode === 'edit') {
-      userForm._id = props.user._id
-      userForm.firstName = props.user.firstName || ''
-      userForm.lastName = props.user.lastName || ''
-      userForm.type = props.user.type || ''
-      userForm.status = props.user.status || ''
+  (mode) => {
+    if (mode === 'create') {
+      Object.keys(props.formData).forEach((key) => (formData[key] = ''))
+    } else if (mode === 'edit' && props._id) {
+      Object.assign(props.formData, props.formData)
     }
   },
   { immediate: true }

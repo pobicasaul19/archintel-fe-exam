@@ -55,6 +55,7 @@ const login = async () => {
 </script>
 
 <template>
+  <app-mode />
   <div class="flex flex-col items-center justify-center w-full h-screen">
     <form @submit.prevent="login" class="border p-10 rounded-lg shadow-sm space-y-6">
       <FloatLabel>
@@ -78,7 +79,7 @@ const login = async () => {
           :loading="loading"
           :label="loading ? '' : 'Login'"
           style="text-align: left; padding: 15px"
-          class="rounded w-[18rem] !bg-[#0799c7] hover:!bg-gray-900 !border-transparent"
+          class="rounded w-[18rem] !text-center"
         />
       </div>
     </form>

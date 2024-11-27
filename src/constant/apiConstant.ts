@@ -29,3 +29,6 @@ export const AUTH_ENDPOINTS = {
 
 // USER_ENDPOINTS
 export const USER_ENDPOINTS = createCrudEndpoints('users');
+
+// COMPANY_ENDPOINT
+export const COMPANY_ENDPOINTS = createCrudEndpoints('companies');

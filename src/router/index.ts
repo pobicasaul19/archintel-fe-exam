@@ -1,28 +1,35 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/useAuthStore";
+import AppLayout from '../layout/AppLayout.vue';
 
 const routes = [
+  {
+    path: '/',
+    component: AppLayout,
+    children: [
+      {
+        path: "/",
+        name: "\u2015 Dashboard",
+        component: () => import(/* webpackChunkName: "dashboard" */ "../views/HomeView.vue"),
+        meta: {
+          authRequired: true,
+        },
+      },
+      {
+        path: "/media",
+        name: "\u2015 All Media",
+        component: () => import(/* webpackChunkName: "dashboard" */ "../views/AllMediaView.vue"),
+        meta: {
+          authRequired: true,
+        },
+      },
+    ]
+  },
   {
     path: "/account/login",
     name: "\u2015 Log-in",
     component: () =>
       import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
-  },
-  {
-    path: "/",
-    name: "\u2015 Dashboard",
-    component: () => import(/* webpackChunkName: "dashboard" */ "../views/HomeView.vue"),
-    meta: {
-      authRequired: true,
-    },
-  },
-  {
-    path: "/all-media",
-    name: "\u2015 All Media",
-    component: () => import(/* webpackChunkName: "dashboard" */ "../views/AllMediaView.vue"),
-    meta: {
-      authRequired: true,
-    },
   },
 ];
 
