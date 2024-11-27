@@ -13,6 +13,7 @@ export interface User {
 }
 
 export interface UserPayload {
+  _id: number;
   firstName: string;
   lastName: string;
   type: string;

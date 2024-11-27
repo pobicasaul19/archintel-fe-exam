@@ -15,8 +15,7 @@ class UserService {
       `${USER_ENDPOINTS.POST}/create`,
       payload
     );
-    console.log(response.data)
-    return response as any;
+    return response.data as any;
   }
 
   public async updateUser(payload: UserPayload, _id: number): Promise<void> {

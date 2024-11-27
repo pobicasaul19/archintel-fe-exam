@@ -7,7 +7,8 @@ import UserService from '../services/UserService'
 import type { User, UserPayload } from '../models/User'
 
 const authStore = useAuthStore()
-const userName = computed(() => authStore.getUsername)
+const userName = computed(() => authStore.getUsername);
+const editor = computed(() => authStore.userInfo?.type === 'editor')
 
 const logout = () => {
   authStore.logout()
@@ -40,20 +41,20 @@ const onGetUsers = async () => {
   }
 }
 
-onMounted(async () => {
-  await onGetUsers()
+onMounted(() => {
+  onGetUsers()
 })
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center h-screen w-full space-y-5">
+  <main class="flex flex-col items-center h-screen w-full space-y-5">
     <h1 class="text-2xl">Home Page</h1>
-    <p>Welcome, {{ userName }}</p>
+    <p class="capitalize">Welcome, {{ userName }}</p>
     <Button class="w-24" @click="logout" label="Logout" />
 
     <div class="flex space-x-5">
       <Button
-        v-if="authStore.getUserInfo?.type === 'Editor'"
+        v-if="editor"
         @click="onClickOpenCreate"
         type="button"
         severity="warn"
@@ -61,10 +62,15 @@ onMounted(async () => {
         label="Create user"
       />
     </div>
-    <DataTable :value="users" tableStyle="min-width: 50rem">
+    <DataTable
+      :value="users"
+      tableStyle="min-width: 50rem"
+      class="capitalize"
+      v-if="editor"
+    >
       <template #empty>
-        <p class="text-center" v-if="!loading">No data available</p>
-        <Skeleton v-else />
+        <Skeleton v-if="loading" />
+        <p class="text-center" v-else>No data available</p>
       </template>
       <Column field="firstName" header="Firstname" />
       <Column field="lastName" header="Lastname" />
@@ -88,13 +94,7 @@ onMounted(async () => {
   </Dialog>
 
   <Dialog v-model:visible="editUser" modal header="Update user" :style="{ width: '25rem' }">
-    <AppForm
-      :onGetData="onGetUsers"
-      :users="users"
-      :user="selectedUser"
-      @close="createUser = false"
-      mode="edit"
-    />
+    <AppForm :onGetData="onGetUsers" :user="selectedUser" @close="editUser = false" mode="edit" />
   </Dialog>
 </template>
 
