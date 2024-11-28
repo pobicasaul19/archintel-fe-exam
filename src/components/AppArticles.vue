@@ -13,7 +13,7 @@ const props = defineProps<{
 const authStore = useAuthStore();
 
 const articleForm = reactive<Record<string, any>>({
-  company: '',
+  company: props.company,
   image: '',
   title: '',
   link: '',
@@ -34,7 +34,6 @@ const editUser = ref(false)
 const createUser = ref(false)
 const onClickOpenEdit = (data: ArticlePayload) => {
   editUser.value = true
-  articleForm.company = data.company || { name: '', value: '' }
   Object.assign(articleForm, data)
 }
 const onClickOpenCreate = () => {
@@ -60,7 +59,7 @@ const itemFields = [
   {
     type: 'select',
     label: 'Company',
-    model: 'company._id',
+    model: props.company,
     options: props.company
   },
   {
@@ -154,6 +153,7 @@ onMounted(() => {
   >
     <AppForm
       :onGetData="onGetArticles"
+      :isPublish="true"
       :formData="articleForm"
       :itemFields="itemFields"
       :create="ArticleService.addArticle"

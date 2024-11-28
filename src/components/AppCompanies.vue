@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { status } from '../utils/types'
-
 import CompanyService from '../services/CompanyService'
 import type { Company } from '../models/Company'
 
 const props = defineProps<{
-  onGetCompany: () => void;
-  images: { logo: string; name: string; status: string }[];
-}>();
+  onGetCompany: () => void
+  images: Company[]
+  loading: boolean
+}>()
 
 const companyForm = reactive<Record<string, any>>({
   logo: '',
@@ -46,63 +46,39 @@ const onClickOpenEdit = (data: Company) => {
 const onClickOpenCreate = () => {
   createCompany.value = true
 }
-
-const responsiveOptions = ref([
-  {
-    breakpoint: '1300px',
-    numVisible: 4
-  },
-  {
-    breakpoint: '575px',
-    numVisible: 1
-  }
-])
 </script>
 
 <template>
   <div class="space-y-5">
     <h1 class="text-3xl font-medium">Company Management</h1>
     <app-button :editor="true" :onClick="onClickOpenCreate" label="Create Company" />
-    <Galleria
-      :value="images"
-      :responsiveOptions="responsiveOptions"
-      :numVisible="5"
-      :circular="true"
-      containerStyle="max-width: 640px"
-      :showItemNavigators="true"
-      :showThumbnails="false"
-    >
-      <template #item="slotProps">
-        <img
-          :src="slotProps.item.logo"
-          :alt="slotProps.item.name"
-          loading="eager"
-          decoding="async"
-          style="width: 100%; display: block"
-        />
-      </template>
-      <template #thumbnail="slotProps">
-        <img
-          :src="slotProps.item.logo"
-          :alt="slotProps.item.name"
-          loading="eager"
-          decoding="async"
-          style="display: block"
-        />
-      </template>
-      <template #caption="slotProps">
-        <div class="text-xl mb-2 font-bold">{{ slotProps.item.name }}</div>
-        <div class="flex justify-between">
-          <p class="text-white capitalize">{{ slotProps.item.status }}</p>
-          <p
-            @click="onClickOpenEdit(slotProps.item)"
-            class="cursor-pointer underline underline-offset-2"
-          >
-            Edit
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Card v-for="(item, i) in images" :key="i">
+        <template #header>
+          <div class="h-96 flex items-center justify-end">
+            <ProgressSpinner v-if="props.loading" />
+            <Image :src="item.logo" :alt="item.name" preview class="p-5 w-full h-full" v-else />
+          </div>
+        </template>
+        <template #title>
+          <p class="flex flex-col items-start sm:items-center sm:flex-row sm:space-x-1">
+            <span> {{ item.name }} - </span>
+            <span
+              :class="[
+                'text-base capitalize',
+                item.status === 'active' ? 'text-green-600' : 'text-red-600'
+              ]"
+            >
+              {{ item.status }}
+            </span>
           </p>
-        </div>
-      </template>
-    </Galleria>
+        </template>
+
+        <template #footer>
+          <Button @click="onClickOpenEdit(item)" label="Edit" severity="info" class="w-36" />
+        </template>
+      </Card>
+    </div>
   </div>
 
   <Dialog
@@ -135,3 +111,14 @@ const responsiveOptions = ref([
     />
   </Dialog>
 </template>
+
+
+<style lang='scss'>
+.p-image {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+</style>

@@ -27,7 +27,6 @@ const onGetCompanies = async () => {
   }
 }
 
-// Fetch data on component mount
 onMounted(() => {
   onGetCompanies()
 })
@@ -41,8 +40,10 @@ onMounted(() => {
       :onGetCompany="onGetCompanies"
       :company="companies"
       :images="images"
+      :loading="loading"
     />
-    <app-articles :onGetData="onGetCompanies" :company="companies" />
+
+    <app-articles v-if="companies.length > 0" :onGetData="onGetCompanies" :company="companies" />
   </div>
 </template>
 

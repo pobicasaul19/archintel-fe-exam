@@ -40,7 +40,7 @@
             <Select
               v-model:model-value="formData[items.model]"
               :options="items.options"
-              :option-value="items.label === 'Company' ? '_id' : 'value'"
+              :option-value="items.label === 'Company' ? 'name' : 'value'"
               option-label="name"
               appendTo="body"
               class="w-full"
@@ -105,15 +105,16 @@ const loading = ref(false)
 
 // Save or Update function
 const saveOrUpdate = async () => {
-  const payload = {
+  const publishPayload = {
     ...formData,
     status: 'For Edit',
     writer: `${authStore.userInfo?.firstName} ${authStore.userInfo?.lastName}`
-  } as any
-  console.log(payload)
+  }
+  const payload = { ...formData }
   delete payload._id
-  delete payload.alt
-  props.mode === 'create' ? await props.create(payload) : await props.update(payload, props._id)
+  props.mode === 'create'
+    ? await props.create(props.isPublish ? publishPayload : payload)
+    : await props.update(props.isPublish ? publishPayload : payload, props._id)
 }
 
 // Save logic
@@ -130,7 +131,12 @@ const onSave = async () => {
     props.onGetData()
     emit('close')
   } catch (error) {
-    console.error(error)
+    showToast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Please add all fields.',
+      life: 3000
+    })
   } finally {
     loading.value = false
   }

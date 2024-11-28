@@ -25,10 +25,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-5">
+  <div v-if="loading" class="h-[50rem] flex items-center justify-center">
+    <ProgressSpinner />
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" v-else>
     <Card v-for="(article, i) in articles.slice(0, 2)" :key="i">
       <template #header>
-        <img :src="article.image" :alt="article.title" />
+        <img :src="article.image" :alt="article.title" class="p-5" />
       </template>
       <template #title
         >{{ article.title }} -
