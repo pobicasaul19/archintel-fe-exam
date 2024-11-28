@@ -5,12 +5,11 @@ import AppHeader from './AppHeader.vue';
 <template>
   <div class="layout-wrapper">
     <app-header />
-    <div class="layout-main-container">
-      <div class="layout-main">
+    <div class="layout-main">
+      <div class="layout-main-container">
         <router-view />
       </div>
     </div>
-    <div class="layout-mask animate-fadein"></div>
   </div>
   <Toast />
 </template>

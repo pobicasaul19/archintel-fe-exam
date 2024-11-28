@@ -32,3 +32,6 @@ export const USER_ENDPOINTS = createCrudEndpoints('users');
 
 // COMPANY_ENDPOINT
 export const COMPANY_ENDPOINTS = createCrudEndpoints('companies');
+
+// ARTICLE ENDPONT
+export const ARTICLE_ENDPOINT = createCrudEndpoints('articles');

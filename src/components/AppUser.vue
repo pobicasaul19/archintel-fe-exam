@@ -1,12 +1,9 @@
 <script lang="ts" setup>
-import { computed, reactive, ref, onMounted } from 'vue'
-import { useAuthStore } from '../stores/useAuthStore'
+import { reactive, ref, onMounted } from 'vue'
 import UserService from '../services/UserService'
 import type { User, UserPayload } from '../models/User'
 import { type, status } from '../utils/types'
 
-const authStore = useAuthStore()
-const editor = computed(() => authStore.userInfo?.type === 'editor')
 
 const userForm = reactive<Record<string, any>>({
   firstName: '',
@@ -78,38 +75,27 @@ onMounted(() => {
 </script>
 
 <template>
-  <Button
-    v-if="editor"
-    @click="onClickOpenCreate"
-    type="button"
-    severity="warn"
-    class="space-x-2 !border-transparent mb-5"
-    label="Create User"
-  />
-
-  <!-- User Table -->
-  <DataTable
-    :value="users"
-    tableStyle="min-width: 50rem"
-    class="capitalize datatable-container"
-    v-if="editor"
-  >
-    <template #empty>
-      <Skeleton v-if="loading" />
-      <p class="text-center" v-else>No data available</p>
-    </template>
-    <Column field="firstName" header="Firstname" />
-    <Column field="lastName" header="Lastname" />
-    <Column field="type" header="Type" />
-    <Column field="status" header="Status" />
-    <Column field="" header="Edit">
-      <template #body="{ data }">
-        <i class="pi pi-pencil cursor-pointer" @click="onClickOpenEdit(data)" />
+  <div class="space-y-5">
+    <h1 class="text-3xl font-medium">User Management</h1>
+    <app-button :editor="true" :onClick="onClickOpenCreate" label="Create User" />
+    <DataTable :value="users" tableStyle="min-width: 50rem" class="capitalize datatable-container">
+      <template #empty>
+        <Skeleton v-if="loading" />
+        <p class="text-center" v-else>No data available</p>
       </template>
-    </Column>
-  </DataTable>
+      <Column field="firstName" header="Firstname" />
+      <Column field="lastName" header="Lastname" />
+      <Column field="type" header="Type" />
+      <Column field="status" header="Status" />
+      <Column field="" header="Action">
+        <template #body="{ data }">
+          <i class="pi pi-pencil cursor-pointer" @click="onClickOpenEdit(data)" />
+        </template>
+      </Column>
+    </DataTable>
+  </div>
 
-  <Dialog v-model:visible="createUser" modal header="Create New User" :style="{ width: '25rem' }">
+  <Dialog v-model:visible="createUser" modal header="Create New User" :style="{ width: '40rem' }">
     <AppForm
       :formData="userForm"
       :itemFields="itemFields"
@@ -121,7 +107,7 @@ onMounted(() => {
     />
   </Dialog>
 
-  <Dialog v-model:visible="editUser" modal header="Update User" :style="{ width: '25rem' }">
+  <Dialog v-model:visible="editUser" modal header="Update User" :style="{ width: '40rem' }">
     <AppForm
       :formData="userForm"
       :itemFields="itemFields"

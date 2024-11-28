@@ -1,32 +1,25 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import CompanyService from '../services/CompanyService'
+import type { Company } from '../models/Company'
 import { useAuthStore } from '../stores/useAuthStore'
 
-import UserService from '../services/UserService'
-import type { User, UserPayload } from '../models/User'
-
 const authStore = useAuthStore()
-const editor = computed(() => authStore.userInfo?.type === 'editor')
 
-const editUser = ref(false)
-const createUser = ref(false)
-const selectedUser = ref({} as UserPayload)
-
-const onClickOpenEdit = (data: UserPayload) => {
-  editUser.value = true
-  selectedUser.value = data
-}
-const onClickOpenCreate = () => {
-  createUser.value = true
-}
-
-const users = ref([] as User[])
+const companies = ref<Company[]>([])
 const loading = ref(true)
-const onGetUsers = async () => {
+const images = ref([] as { logo: string; name: string; status: string }[])
+const onGetCompanies = async () => {
   loading.value = true
   try {
-    const data = await UserService.getUsers()
-    users.value = data
+    const data = await CompanyService.getCompanies()
+    companies.value = data
+    images.value = companies.value.map((company) => ({
+      _id: company._id,
+      logo: company.logo,
+      name: company.name,
+      status: company.status
+    }))
   } catch (error) {
     console.log(error)
   } finally {
@@ -34,51 +27,23 @@ const onGetUsers = async () => {
   }
 }
 
+// Fetch data on component mount
 onMounted(() => {
-  onGetUsers()
+  onGetCompanies()
 })
 </script>
 
 <template>
-  <div class="space-y-10">
-    <div>
-      <app-user />
-    </div>
-    <div>
-      <app-companies />
-    </div>
-    <div>
-      <Button
-        v-if="editor"
-        @click="onClickOpenCreate"
-        type="button"
-        severity="warn"
-        class="space-x-2 !border-transparent mb-5"
-        label="Create article"
-      />
-      <DataTable
-        :value="users"
-        tableStyle="min-width: 50rem"
-        class="capitalize datatable-container"
-        v-if="editor"
-      >
-        <template #empty>
-          <Skeleton v-if="loading" />
-          <p class="text-center" v-else>No data available</p>
-        </template>
-        <Column field="firstName" header="Firstname" />
-        <Column field="lastName" header="Lastname" />
-        <Column field="type" header="Type" />
-        <Column field="status" header="Status" />
-        <Column field="" header="Edit">
-          <template #body="{ data }">
-            <i class="pi pi-pencil cursor-pointer" @click="onClickOpenEdit(data)" />
-          </template>
-        </Column>
-      </DataTable>
-    </div>
+  <div class="flex flex-col space-y-10">
+    <app-user v-if="authStore.isEditor" />
+    <app-companies
+      v-if="authStore.isEditor"
+      :onGetCompany="onGetCompanies"
+      :company="companies"
+      :images="images"
+    />
+    <app-articles :onGetData="onGetCompanies" :company="companies" />
   </div>
-
 </template>
 
 <style>

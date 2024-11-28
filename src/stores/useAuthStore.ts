@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<AuthUser['token']>(null);
 
   // Getters
+  const isEditor = computed(() => userInfo.value?.type === 'editor')
   const isAuthenticated = computed(() => !!userInfo.value && !!token.value);
   const getUserInfo = computed(() => userInfo.value);
   const getUserById = (_id: number) => computed(() => userInfo.value?._id === _id);
@@ -28,6 +29,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     userInfo,
     token,
+    isEditor,
     isAuthenticated,
     getUserInfo,
     getUserById,

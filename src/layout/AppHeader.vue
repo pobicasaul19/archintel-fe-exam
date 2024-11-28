@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import router from '../router'
-import { useLayout } from '../layout/layout'
+import { useLayout } from './layout'
 import { useAuthStore } from '../stores/useAuthStore'
 import { ref } from 'vue'
 
@@ -42,13 +42,13 @@ const toggle = (e: Event) => {
       </template>
     </div>
 
-    <div class="layout-topbar-actions">
-      <div class="layout-config-menu">
+    <div class="layout-topbar-menu">
+      <div class="layout-topbar-action">
         <i
           @click="toggleDarkMode"
-          :class="['layout-topbar-action pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"
+          :class="['layout-topbar-actions pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"
         />
-        <div class="layout-topbar-action">
+        <div class="layout-topbar-actions">
           <i class="pi pi-user" @click="toggle" />
         </div>
       </div>
