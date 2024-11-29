@@ -40,12 +40,11 @@ const login = async () => {
   try {
     const response = await LoginService.validateLogin(form.value)
     handleSuccess(response)
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
     toast.add({
       severity: 'error',
       summary: 'Login Failed',
-      detail: 'An error occurred while logging in.',
+      detail: error.response.data.message,
       life: 3000
     })
   } finally {

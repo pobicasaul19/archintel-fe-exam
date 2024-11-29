@@ -1,14 +1,9 @@
 import axios, {
   AxiosError,
   type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosRequestHeaders,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
 } from "axios";
+import { axiosConfig, tokenInjector } from './apiConfig';
 import router from "@/router";
-import { useAuthStore } from "@/stores/useAuthStore";
-
 
 export interface ApiError {
   message: string;
@@ -16,27 +11,16 @@ export interface ApiError {
   details?: any;
 }
 
-interface ErrorResponse<T> {
-  data?: T;
-  metadata?: {
-    message: string;
-  };
-}
-
-export type RequestParam = Record<string, any>;
-export interface ApiResponse<T> {
+export type ApiResponse<T> = {
   data?: T;
   error?: ApiError;
-}
+};
 
-const authStore = useAuthStore();
-const apiUrl = 'http://localhost:5000/api'
-
-export class HttpClient {
+class HttpClient {
   protected axiosInstance: AxiosInstance;
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: apiUrl,
+      baseURL: axiosConfig.baseURL,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -44,75 +28,32 @@ export class HttpClient {
     });
   }
 
-  private static handleResponse<T>(response: AxiosResponse): ApiResponse<T> {
+  // Helper method to handle responses
+  private handleResponse<T>(response: any): ApiResponse<T> {
     return response.data;
   }
 
-  private static translateAxiosError(error: AxiosError): ApiError {
-    const statusCode = error.response?.status;
-    const errorMessage = (error.response?.data as ErrorResponse<unknown>)?.metadata?.message
-                         || 'An error occurred while processing your request.';
-    const errorDetails = (error.response?.data as ErrorResponse<unknown>)?.data;
-
-    if (statusCode === 401) {
-      router.push({ name: 'Login' });
-    }
-
-    return {
-      message: errorMessage,
-      status: statusCode,
-      details: errorDetails,
-    };
+  // HTTP method wrappers
+  public async get<T>(path: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.get<T>(path, { params });
+    return this.handleResponse<T>(response);
   }
 
-  private async request<T>(
-    method: 'get' | 'post' | 'put' | 'delete',
-    path: string,
-    data?: any,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.request<T>({
-        method,
-        url: path,
-        data,
-        ...config,
-      });
-      return HttpClient.handleResponse(response);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        throw HttpClient.translateAxiosError(err);
-      }
-      throw err;
-    }
+  public async post<T, P>(path: string, payload: P): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.post<T>(path, payload);
+    return this.handleResponse<T>(response);
   }
 
-  public get<T>(path: string, params?: RequestParam): Promise<ApiResponse<T>> {
-    return this.request('get', path, undefined, { params });
+  public async put<T, P>(path: string, payload: P): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.put<T>(path, payload);
+    return this.handleResponse<T>(response);
   }
 
-  public post<T, P>(path: string, payload: P, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request('post', path, payload, config);
-  }
-
-  public put<T, P>(path: string, payload: P, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request('put', path, payload, config);
-  }
-
-  public delete<T>(path: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    return this.request('delete', path, undefined, config);
+  public async delete<T>(path: string): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.delete<T>(path);
+    return this.handleResponse<T>(response);
   }
 }
-
-const tokenInjector = (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-  const token = authStore.token;
-  config.headers = config.headers || {} as AxiosRequestHeaders;
-  if (token) {
-    (config.headers as AxiosRequestHeaders)['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-};
-
 
 const authorizedClientError = (error: AxiosError): Promise<never> => {
   if (error.response?.status === 403) {
@@ -120,6 +61,7 @@ const authorizedClientError = (error: AxiosError): Promise<never> => {
   }
   return Promise.reject(error);
 };
+
 
 class AuthorizedHttpClient extends HttpClient {
   constructor() {
@@ -129,6 +71,6 @@ class AuthorizedHttpClient extends HttpClient {
   }
 }
 
+// Create instances of HttpClient and AuthorizedHttpClient
 export const authorizedHttpClient = new AuthorizedHttpClient();
 export const httpClient = new HttpClient();
-

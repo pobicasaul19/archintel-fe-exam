@@ -130,11 +130,11 @@ const onSave = async () => {
     })
     props.onGetData()
     emit('close')
-  } catch (error) {
+  } catch (error: any) {
     showToast.add({
       severity: 'error',
       summary: 'Error',
-      detail: 'Please add all fields.',
+      detail: error.response.data.message,
       life: 3000
     })
   } finally {
@@ -162,8 +162,13 @@ const onPublish = async () => {
     })
     props.onGetData()
     emit('close')
-  } catch (error) {
-    console.error(error)
+  } catch (error: any) {
+    showToast.add({
+      severity: 'error',
+      summary: 'Login Failed',
+      detail: error.response.data.message,
+      life: 3000
+    })
   } finally {
     isLoading.value = false
   }
