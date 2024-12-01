@@ -15,6 +15,7 @@ const form = ref<loginData>({
   userName: '',
   password: ''
 })
+const error = ref<any | null>(null)
 
 interface DataResponse {
   user: User
@@ -40,13 +41,14 @@ const login = async () => {
   try {
     const response = await LoginService.validateLogin(form.value)
     handleSuccess(response)
-  } catch (error: any) {
+  } catch (err: any) {
     toast.add({
       severity: 'error',
       summary: 'Login Failed',
-      detail: error.response.data.message,
+      detail: err.response.data.message,
       life: 3000
     })
+    error.value = err.response.data.message
   } finally {
     loading.value = false
   }
@@ -58,7 +60,13 @@ const login = async () => {
   <div class="flex flex-col items-center justify-center w-full h-screen">
     <form @submit.prevent="login" class="border p-10 rounded-lg shadow-sm space-y-6">
       <FloatLabel>
-        <InputText id="username" type="name" v-model="form.userName" class="mt-1 block w-full" />
+        <InputText
+          id="username"
+          type="name"
+          v-model="form.userName"
+          :invalid="error"
+          class="mt-1 block w-full"
+        />
         <label class="block" for="username">Username</label>
       </FloatLabel>
       <FloatLabel class="w-full">
@@ -69,6 +77,7 @@ const login = async () => {
           toggleMask
           class="w-full"
           :feedback="false"
+          :invalid="error"
         />
         <label for="password">Password</label>
       </FloatLabel>
