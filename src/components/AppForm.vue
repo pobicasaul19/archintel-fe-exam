@@ -113,8 +113,6 @@ const saveOrUpdate = async () => {
     writer: `${authStore.userInfo?.firstName} ${authStore.userInfo?.lastName}`
   }
   const payload = { ...formData }
-
-  console.log(payload, publishPayload)
   delete payload._id
   props.mode === 'create'
     ? await props.create(props.isPublish ? publishPayload : payload)

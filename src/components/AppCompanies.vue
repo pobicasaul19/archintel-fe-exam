@@ -52,7 +52,10 @@ const onClickOpenCreate = () => {
   <div class="space-y-5">
     <h1 class="text-3xl font-medium">Company Management</h1>
     <AppButton :editor="true" :onClick="onClickOpenCreate" label="Create Company" />
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div v-if="props.loading" class="h-[50rem] flex items-center justify-center">
+    <ProgressSpinner />
+  </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5" v-else>
       <Card v-for="(item, i) in images" :key="i">
         <template #header>
           <div class="h-96 flex items-center justify-end">

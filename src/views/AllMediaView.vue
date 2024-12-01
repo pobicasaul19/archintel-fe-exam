@@ -34,8 +34,8 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col space-y-10">
-    <app-user v-if="authStore.isEditor" />
-    <app-companies
+    <AppUser v-if="authStore.isEditor" />
+    <AppCompanies
       v-if="authStore.isEditor"
       :onGetCompany="onGetCompanies"
       :company="companies"
@@ -43,7 +43,7 @@ onMounted(() => {
       :loading="loading"
     />
 
-    <app-articles v-if="companies.length > 0" :onGetData="onGetCompanies" :company="companies" />
+    <AppArticles v-if="companies.length > 0" :onGetData="onGetCompanies" :company="companies" />
   </div>
 </template>
 
