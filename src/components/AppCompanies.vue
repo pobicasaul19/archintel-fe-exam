@@ -51,7 +51,7 @@ const onClickOpenCreate = () => {
 <template>
   <div class="space-y-5">
     <h1 class="text-3xl font-medium">Company Management</h1>
-    <app-button :editor="true" :onClick="onClickOpenCreate" label="Create Company" />
+    <AppButton :editor="true" :onClick="onClickOpenCreate" label="Create Company" />
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <Card v-for="(item, i) in images" :key="i">
         <template #header>

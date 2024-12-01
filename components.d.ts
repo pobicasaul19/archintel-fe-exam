@@ -10,6 +10,7 @@ declare module 'vue' {
     AppArticles: typeof import('./src/components/AppArticles.vue')['default']
     AppButton: typeof import('./src/components/AppButton.vue')['default']
     AppCompanies: typeof import('./src/components/AppCompanies.vue')['default']
+    AppDatatable: typeof import('./src/components/AppDatatable.vue')['default']
     AppForm: typeof import('./src/components/AppForm.vue')['default']
     AppMode: typeof import('./src/components/AppMode.vue')['default']
     AppSidenav: typeof import('./src/components/AppSidenav.vue')['default']

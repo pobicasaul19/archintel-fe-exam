@@ -1,9 +1,11 @@
 <script lang="ts" setup>
-import { reactive, ref, onMounted, computed } from 'vue'
+import { reactive, ref, onMounted, computed, h } from 'vue'
 import { useAuthStore } from '../stores/useAuthStore'
 import ArticleService from '../services/ArticleService'
 import type { Article, ArticlePayload } from '../models/Article'
 import type { Company } from '../models/Company'
+import type { IAppDatatableHeader } from './AppDatatable.vue'
+import Button from 'primevue/button'
 
 const props = defineProps<{
   onGetData: () => void
@@ -90,6 +92,68 @@ const itemFields = [
   }
 ]
 
+const header: IAppDatatableHeader[] = [
+  {
+    header: 'Image',
+    field: 'image',
+    style: 'min-width: 150px',
+    renderComponent: (data: Article) => {
+      return h('img', {
+        src: data.image,
+        alt: data.title,
+        class: 'w-24 h-24 rounded object-contain'
+      })
+    }
+  },
+  {
+    header: 'Title',
+    field: 'title',
+    style: 'min-width: 150px'
+  },
+  {
+    header: 'Link',
+    field: 'Link',
+    style: 'min-width: 150px',
+    renderComponent: (data: Article) => {
+      return h(
+        'span',
+        {
+          class: 'underline underline-offset-2 cursor-pointer',
+          onClick: () => {
+            const url = data.link
+            window.open(url, '_blank')
+          }
+        },
+        'Source'
+      )
+    }
+  },
+  {
+    header: 'Writer',
+    field: 'writer',
+    style: 'min-width: 200px'
+  },
+  {
+    header: 'Editor',
+    field: 'editor',
+    style: 'min-width: 200px'
+  },
+  {
+    header: 'Action',
+    field: '',
+    style: 'min-width: 150px',
+    renderComponent: (data: Article) => {
+      return h(Button, {
+        disabled: data.status === 'Published' && !authStore.isEditor,
+        icon: 'pi pi-pencil cursor-pointer',
+        severity: 'secondary',
+        rounded: true,
+        onClick: () => onClickOpenEdit(data)
+      })
+    }
+  }
+]
+
 onMounted(() => {
   onGetArticles()
 })
@@ -98,52 +162,14 @@ onMounted(() => {
 <template>
   <div class="space-y-5">
     <h1 class="text-3xl font-medium">Article Management</h1>
-    <app-button :editor="true" :onClick="onClickOpenCreate" label="Create Article" />
-    <DataTable
-      :value="articles"
-      tableStyle="min-width: 50rem"
-      class="capitalize datatable-container"
-    >
-      <template #empty>
-        <Skeleton v-if="loading" />
-        <p class="text-center" v-else>No data available</p>
-      </template>
-      <Column header="Image">
-        <template #body="{ data }">
-          <img :src="data.image" :alt="data.image" class="w-24 rounded object-contain" />
-        </template>
-      </Column>
-      <Column field="title" header="Title" />
-      <Column field="link" header="Link">
-        <template #body="{ data }">
-          <a class="underline underline-offset-2" :href="data.link" target="_blank">{{
-            data.link
-          }}</a>
-        </template>
-      </Column>
-      <Column field="" header="Writer">
-        <template #body="{ data }">
-          <span>{{ data.writer || '--' }}</span>
-        </template>
-      </Column>
-      <Column field="" header="Editor">
-        <template #body="{ data }">
-          <span>{{ data.editor || '--' }} </span>
-        </template>
-      </Column>
-      <Column field="status" header="Status" />
-      <Column field="" header="Action">
-        <template #body="{ data }">
-          <Button
-            :disabled="data.status === 'Published' && !authStore.isEditor"
-            icon="pi pi-pencil cursor-pointer"
-            @click="onClickOpenEdit(data)"
-            severity="secondary"
-            rounded
-          />
-        </template>
-      </Column>
-    </DataTable>
+    <AppButton :editor="true" :onClick="onClickOpenCreate" label="Create Article" />
+
+    <AppDatatable
+      :onGetData="onGetArticles"
+      :items="articles"
+      :header="header"
+      :loading="loading"
+    />
   </div>
 
   <Dialog

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, h } from 'vue'
 import UserService from '../services/UserService'
 import type { User, UserPayload } from '../models/User'
 import { type, status } from '../utils/types'
-
+import type { IAppDatatableHeader } from './AppDatatable.vue'
+import Button from 'primevue/button'
 
 const userForm = reactive<Record<string, any>>({
   firstName: '',
@@ -17,6 +18,31 @@ const resetUserForm = () => {
   userForm.lastName = ''
   userForm.type = ''
   userForm.status = ''
+}
+
+const editUser = ref(false)
+const createUser = ref(false)
+const onClickOpenEdit = (data: UserPayload) => {
+  editUser.value = true
+  Object.assign(userForm, data)
+}
+const onClickOpenCreate = () => {
+  createUser.value = true
+  resetUserForm()
+}
+
+const users = ref<User[]>([])
+const loading = ref(true)
+const onGetUsers = async () => {
+  loading.value = true
+  try {
+    const data = await UserService.getUsers()
+    users.value = data
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
 }
 
 const itemFields = [
@@ -44,30 +70,41 @@ const itemFields = [
   }
 ]
 
-const editUser = ref(false)
-const createUser = ref(false)
-const onClickOpenEdit = (data: UserPayload) => {
-  editUser.value = true
-  Object.assign(userForm, data)
-}
-const onClickOpenCreate = () => {
-  createUser.value = true
-  resetUserForm()
-}
-
-const users = ref<User[]>([])
-const loading = ref(true)
-const onGetUsers = async () => {
-  loading.value = true
-  try {
-    const data = await UserService.getUsers()
-    users.value = data
-  } catch (error) {
-    console.error(error)
-  } finally {
-    loading.value = false
+const header: IAppDatatableHeader[] = [
+  {
+    header: 'Firstname',
+    field: 'firstName',
+    style: 'min-width: 150px'
+  },
+  {
+    header: 'Lastname',
+    field: 'lastName',
+    style: 'min-width: 150px'
+  },
+  {
+    header: 'Type',
+    field: 'type',
+    style: 'min-width: 150px'
+  },
+  {
+    header: 'Status',
+    field: 'status',
+    style: 'min-width: 200px'
+  },
+  {
+    header: 'Action',
+    field: '',
+    style: 'min-width: 150px',
+    renderComponent: (data: User) => {
+      return h(Button, {
+        icon: 'pi pi-pencil cursor-pointer',
+        severity: 'secondary',
+        rounded: true,
+        onClick: () => onClickOpenEdit(data)
+      })
+    }
   }
-}
+]
 
 onMounted(() => {
   onGetUsers()
@@ -77,22 +114,8 @@ onMounted(() => {
 <template>
   <div class="space-y-5">
     <h1 class="text-3xl font-medium">User Management</h1>
-    <app-button :editor="true" :onClick="onClickOpenCreate" label="Create User" />
-    <DataTable :value="users" tableStyle="min-width: 50rem" class="capitalize datatable-container">
-      <template #empty>
-        <Skeleton v-if="loading" />
-        <p class="text-center" v-else>No data available</p>
-      </template>
-      <Column field="firstName" header="Firstname" />
-      <Column field="lastName" header="Lastname" />
-      <Column field="type" header="Type" />
-      <Column field="status" header="Status" />
-      <Column field="" header="Action">
-        <template #body="{ data }">
-          <i class="pi pi-pencil cursor-pointer" @click="onClickOpenEdit(data)" />
-        </template>
-      </Column>
-    </DataTable>
+    <AppButton :editor="true" :onClick="onClickOpenCreate" label="Create User" />
+    <AppDatatable :onGetData="onGetUsers" :items="users" :header="header" :loading="loading" />
   </div>
 
   <Dialog v-model:visible="createUser" modal header="Create New User" :style="{ width: '40rem' }">
