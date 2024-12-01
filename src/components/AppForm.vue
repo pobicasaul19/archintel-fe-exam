@@ -1,15 +1,15 @@
 <template>
   <form class="space-y-10">
     <div class="flex flex-col gap-5 w-full">
-      <div v-for="(items, i) in itemFields" :key="i" class="flex">
+      <div v-for="(items, i) in itemFields" :key="i" class="grid grid-cols-2">
         <div
-          class="w-64 mr-10 flex justify-between"
+          class="grid grid-cols-2 font-bold"
           v-if="!(items.model === 'password' && mode === 'edit')"
         >
-          <p class="m-0">{{ items.label }}</p>
+          <p class="m-0 font-normal">{{ items.label }}</p>
           <span>:</span>
         </div>
-        <div class="w-3/4">
+        <div class="">
           <template v-if="items.type === 'input'">
             <InputText
               v-model="formData[items.model]"
@@ -40,9 +40,9 @@
             <Select
               v-model:model-value="formData[items.model]"
               :options="items.options"
-              :option-value="items.label === 'Company' ? 'name' : 'value'"
+              :option-value="items.label === 'Company' ? '_id' : 'value'"
               option-label="name"
-              appendTo="body"
+              append-to="body"
               class="w-full"
             />
           </template>
@@ -85,9 +85,11 @@ const props = defineProps<{
   itemFields: Array<{
     type: 'input' | 'select' | 'calendar' | 'textarea'
     label: string
-    model: any
+    model: string
     capitalize?: boolean
-    options?: Array<{ name: string; value: any }>
+    options?: {
+      [key: string]: any
+    }[]
   }>
   user: UserPayload
   mode: 'create' | 'edit'
@@ -111,6 +113,8 @@ const saveOrUpdate = async () => {
     writer: `${authStore.userInfo?.firstName} ${authStore.userInfo?.lastName}`
   }
   const payload = { ...formData }
+
+  console.log(payload, publishPayload)
   delete payload._id
   props.mode === 'create'
     ? await props.create(props.isPublish ? publishPayload : payload)

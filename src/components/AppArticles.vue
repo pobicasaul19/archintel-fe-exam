@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/useAuthStore'
 import ArticleService from '../services/ArticleService'
 import type { Article, ArticlePayload } from '../models/Article'
@@ -10,10 +10,10 @@ const props = defineProps<{
   company: Company[]
 }>()
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
 const articleForm = reactive<Record<string, any>>({
-  company: props.company,
+  company: '',
   image: '',
   title: '',
   link: '',
@@ -55,12 +55,13 @@ const onGetArticles = async () => {
   }
 }
 
+const company = computed(() => props.company.map((t) => t))
 const itemFields = [
   {
     type: 'select',
     label: 'Company',
-    model: props.company,
-    options: props.company
+    model: 'company',
+    options: company.value
   },
   {
     type: 'input',
@@ -134,7 +135,7 @@ onMounted(() => {
       <Column field="" header="Action">
         <template #body="{ data }">
           <Button
-            :disabled="data.status === 'Publish' && !authStore.isEditor"
+            :disabled="data.status === 'Published' && !authStore.isEditor"
             icon="pi pi-pencil cursor-pointer"
             @click="onClickOpenEdit(data)"
             severity="secondary"

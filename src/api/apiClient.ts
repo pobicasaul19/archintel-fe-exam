@@ -48,11 +48,6 @@ class HttpClient {
     const response = await this.axiosInstance.put<T>(path, payload);
     return this.handleResponse<T>(response);
   }
-
-  public async delete<T>(path: string): Promise<ApiResponse<T>> {
-    const response = await this.axiosInstance.delete<T>(path);
-    return this.handleResponse<T>(response);
-  }
 }
 
 const authorizedClientError = (error: AxiosError): Promise<never> => {

@@ -9,11 +9,11 @@ export interface Article {
   status: string;
   writer: string
   editor: string
-  comapny: string;
+  company: string;
 }
 
 export interface ArticlePayload {
-  comapny: string;
+  company: string;
   title: string;
   link: string;
   date: Date;
